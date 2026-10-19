@@ -1,72 +1,69 @@
 # Ring Origami Grasping
 
-MATLAB/COCO programs and Abaqus input files accompanying **“Asymmetry-programmed ring origami for direction-selective deformation pathways and multimodal grasping.”** The programs calculate and visualize ring responses under pure-bending and compression–bending loading.
+MATLAB/COCO programs and Abaqus input files accompanying **“Asymmetry-programmed ring origami for direction-selective deformation pathways and multimodal grasping.”** The programs calculate and visualize ring responses under pure-bending and compression-bending loading.
 
-## File Structure
+## Package contents
 
-```text
-Code available/
-├── README.md, readme.txt                  Overall documentation
-├── Pure-bending/
-│   ├── readme.txt                        Pure-bending usage and rendering settings
-│   ├── Ellipse_M_P1_ringcoco_c.m          Main solver and postprocessing
-│   ├── Ellipse_M_P1_ring_c.m              Governing equations
-│   ├── Ellipse_M_P1_ring_bc_c.m           Boundary conditions
-│   ├── Ellipse_M_P1_ring_bc_DFDX_c.m      Boundary-condition Jacobian
-│   ├── coco_get_labs_at_Y.m              Select labels by loading angle
-│   ├── plotringBend.m                    Plot complete ring centerlines
-│   ├── plotRibbon.m                      Render three-dimensional ring surfaces
-│   ├── J_cal.m                          Calculate the torsional constant
-│   ├── J.m                              Standalone torsional-constant example
-│   ├── linspecer.m                       Line-color utility
-│   ├── tab10.m, tab20.m, tab20b.m, tab20c.m  Colormap utilities
-│   ├── 20260920-0du-c10-ht6.inp           Abaqus: untwisted circular ring
-│   ├── 20260920-60du-c08-ht6.inp          Abaqus: twisted elliptical ring
-│   ├── *_response.mat                   Extracted moment-angle data
-│   ├── *_y1_angle.mat                   Extracted tip-displacement-angle data
-│   ├── data/                            Saved COCO branches and solutions
-│   └── coco/, slanCL/, slanCM/           Local dependency copies
-├── Compression-bending/
-│   ├── readme.txt                        Compression-bending usage and rendering settings
-│   ├── Ellipse_r_M_P1_ringcoco_c.m        Main two-stage solver and postprocessing
-│   ├── Ellipse_r_M_P1_ring_c.m            Governing equations
-│   ├── Ellipse_r_M_P1_ring_bc_c.m         Boundary conditions
-│   ├── Ellipse_r_M_P1_ring_bc_DFDX_c.m    Boundary-condition Jacobian
-│   ├── coco_get_labs_at_Y_exclude.m      Select labels outside specified segments
-│   ├── plotringBend.m                    Plot complete ring centerlines
-│   ├── plotRibbon.m                      Render three-dimensional ring surfaces
-│   ├── J_cal.m                          Calculate the torsional constant
-│   ├── J.m                              Standalone torsional-constant example
-│   ├── interpomap.m                      Interpolate marker colors
-│   ├── quadratic_interpolation.m         Piecewise quadratic interpolation utility
-│   ├── linspecer.m                       Line-color utility
-│   ├── tab10.m, tab20.m, tab20b.m, tab20c.m  Colormap utilities
-│   ├── 20260927-0du-c10-ht4-Forward.inp   Abaqus: circular ring, forward loading
-│   ├── 20260927-60du-c08-ht4-Forward.inp  Abaqus: twisted elliptical ring, forward
-│   ├── 20260927-60du-c08-ht4-Reverse.inp  Abaqus: twisted elliptical ring, reverse
-│   ├── *DYN*.inp                        Abaqus implicit dynamic simulations
-│   ├── h2t4-c08-60du-1.png               Exported configuration rendering
-│   ├── data/                            Saved compression and bending solutions
-│   └── coco/, slanCL/, slanCM/           Local dependency copies
-├── coco/                                Third-party continuation package
-├── slanCL/                              Third-party discrete color palettes
-└── slanCM/                              Third-party continuous colormaps
-```
+| Folder | Main script and contents |
+| --- | --- |
+| `Pure-bending/` | `Ellipse_M_P1_ringcoco_c.m`; pure-bending calculations, Abaqus `.inp` files, saved COCO solutions in `data/`, and extracted response `.mat` files. |
+| `Compression-bending/` | `Ellipse_r_M_P1_ringcoco_c.m`; sequential compression and bending calculations, Abaqus `.inp` files, and saved COCO solutions in `data/`. Files containing `DYN` use implicit dynamic analysis. |
+| `coco/`, `slanCL/`, `slanCM/` | Bundled continuation and color utilities; local copies are also included in the analysis folders. |
 
-The main scripts initialize the shared dependencies beside the two analysis folders.
+Each analysis folder also contains governing equations, boundary conditions, plotting functions, and a `readme.txt` with case-specific instructions.
 
-## Usage
+## System requirements
 
-Use MATLAB with Symbolic Math Toolbox and a compatible `quat2rotm` function for ribbon rendering. Abaqus 2023 is used for the `.inp` files.
+- **Operating system:** Microsoft Windows 10 Pro (64-bit).
+- **MATLAB:** R2024a, with Symbolic Math Toolbox (`ellipticE`). Three-dimensional ribbon rendering also requires `quat2rotm`, available in Robotics System Toolbox (R2024a).
+- **Abaqus:** Abaqus/CAE 2023 for the supplied finite element input files.
+- **Bundled dependencies:** COCO (`coll_v1` and `bvp_v1` recipes), `slanCL`, `slanCM`, and accompanying color utilities. Use the supplied copies.
+- **Tested environment:** MATLAB R2024a and Abaqus 2023 on Windows 10 Pro.
+- **Hardware:** No non-standard hardware is required.
 
-Set the MATLAB current folder to the desired analysis folder. Follow its `readme.txt` to select parameters, run the main script sections, and plot results.
+## Installation
 
-## COCO
+1. Install MATLAB and the required toolboxes using the [MathWorks installation instructions](https://www.mathworks.com/help/install/ug/install-products-with-internet-connection.html). Install Abaqus 2023 from [Dassault Systemes](https://www.3ds.com/support/software-downloads) following its installer instructions. Valid software licenses are required.
+2. Extract the complete code package. In MATLAB, set the current folder to `Pure-bending` or `Compression-bending`. The main scripts add the local COCO and palette paths. Before running postprocessing sections alone, initialize the paths with:
 
-COCO is included in this package and was downloaded from its original developers; it was not developed by the manuscript authors. The scripts use `coll_v1` and `bvp_v1` from `coco/coco/`.
+   ```matlab
+   addpath(genpath(fullfile(pwd, 'coco')));
+   addpath(genpath(fullfile(pwd, 'slanCL')));
+   addpath(genpath(fullfile(pwd, 'slanCM')));
+   coco_use_recipes_toolbox coll_v1 bvp_v1
+   ```
 
-Official downloads: <https://sourceforge.net/projects/cocotools/files/releases/>
+**Expected package setup time:** under 10 minutes on a normal desktop computer once MATLAB, its required toolboxes, and Abaqus are installed. Downloading, installing, and activating these commercial products takes additional time.
 
-## License
+## Demo
 
-USTC
+The supplied `data/` folders contain saved COCO branches and solutions. To reuse these results, skip the solver section and run the desired postprocessing sections with **Run Section** in MATLAB.
+
+| Demo | Main script | Supplied representative case |
+| --- | --- | --- |
+| Pure bending | `Pure-bending/Ellipse_M_P1_ringcoco_c.m` | `idx = 3; i = 3; c = 0.8;` (`h/t = 6`, intrinsic twist = 60 degrees). |
+| Compression-bending | `Compression-bending/Ellipse_r_M_P1_ringcoco_c.m` | `idx = 2; i = 3; c = 0.8;` (`h/t = 4`, intrinsic twist = 60 degrees). |
+
+For detailed plotting instructions, see `readme.txt` in each analysis folder.
+
+**Expected outputs:** moment-angle and grasping-end displacement-angle curves, ring configurations, three-dimensional renderings, and extracted `*_response.mat` and `*_y1_angle.mat` files.
+
+**Expected demo runtime:** under 1 minute per example using the supplied saved results. Recomputing continuation branches or running Abaqus simulations takes additional time.
+
+## Instructions for use
+
+- For MATLAB calculations, adjust the ring parameters in the main script, then run the solver and postprocessing sections.
+- For finite element simulations, import the desired `.inp` file into Abaqus/CAE and submit the job.
+- For detailed parameter and plotting settings, see `readme.txt` in each analysis folder.
+
+## COCO and licensing
+
+COCO was developed by its original authors, not by the manuscript authors. [Official COCO downloads](https://sourceforge.net/projects/cocotools/files/releases/) are available online; the required recipes are bundled here.
+
+**Author-written code:** USTC.
+
+Third-party components retain their original licenses; see the [COCO project](https://sourceforge.net/projects/cocotools/), [slanCL](https://www.mathworks.com/matlabcentral/fileexchange/126969-2000-palettes), [slanCM](https://www.mathworks.com/matlabcentral/fileexchange/120088-200-colormaps), and license notices in the supplied files. MATLAB and Abaqus require their respective commercial licenses.
+
+## Description in the manuscript
+
+The theoretical model and numerical procedures are described in **Methods, Sections 4.1 and 4.4, and Supplementary Note 1**.
