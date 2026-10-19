@@ -46,9 +46,9 @@ The supplied `data/` folders contain saved COCO branches and solutions. To reuse
 
 For detailed plotting instructions, see `readme.txt` in each analysis folder.
 
-**Expected outputs:** moment-angle and grasping-end displacement-angle curves, ring configurations, three-dimensional renderings, and extracted `*_response.mat` and `*_y1_angle.mat` files.
+**Expected outputs:** moment-angle and grasping-end displacement-angle curves, ring configurations and three-dimensional renderings.
 
-**Expected demo runtime:** under 1 minute per example using the supplied saved results. Recomputing continuation branches or running Abaqus simulations takes additional time.
+**Expected demo runtime:** under 1 minute per example. Running Abaqus simulations takes additional time.
 
 ## Instructions for use
 
@@ -64,6 +64,3 @@ COCO was developed by its original authors, not by the manuscript authors. [Offi
 
 Third-party components retain their original licenses; see the [COCO project](https://sourceforge.net/projects/cocotools/), [slanCL](https://www.mathworks.com/matlabcentral/fileexchange/126969-2000-palettes), [slanCM](https://www.mathworks.com/matlabcentral/fileexchange/120088-200-colormaps), and license notices in the supplied files. MATLAB and Abaqus require their respective commercial licenses.
 
-## Description in the manuscript
-
-The theoretical model and numerical procedures are described in **Methods, Sections 4.1 and 4.4, and Supplementary Note 1**.
