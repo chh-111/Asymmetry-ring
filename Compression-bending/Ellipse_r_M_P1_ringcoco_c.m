@@ -3,71 +3,54 @@ clear all;
 clc;
 
 % Initialize the bundled COCO toolboxes relative to this main script.
-script_dir = fileparts(mfilename('fullpath'));
-project_dir = fileparts(script_dir);
-coco_dir = fullfile(project_dir, 'coco', 'coco');
-assert(isfile(fullfile(coco_dir, 'core', 'toolbox', 'coco.m')), ...
-    'Bundled COCO was not found at %s.', coco_dir);
-addpath(script_dir);
-
-% Load the bundled palette functions and their accompanying MAT data.
-addpath(fullfile(project_dir, 'slanCL'), fullfile(project_dir, 'slanCM'));
-
-addpath(fullfile(coco_dir, 'core', 'toolbox'), ...
-    fullfile(coco_dir, 'covering', 'toolbox'), ...
-    fullfile(coco_dir, 'ep', 'toolbox'), ...
-    fullfile(coco_dir, 'coll', 'toolbox'), ...
-    fullfile(coco_dir, 'po', 'toolbox'), ...
-    fullfile(coco_dir, 'recipes'), ...
-    fullfile(coco_dir, 'continex', 'toolbox'), ...
-    fullfile(coco_dir, 'contributed', 'symcoco', 'toolbox'));
+addpath(genpath(fullfile(pwd, 'coco')));
+addpath(genpath(fullfile(pwd, 'slanCL')));
 
 coco_use_recipes_toolbox coll_v1 bvp_v1 % add the coll_v1 and bvp_v1 toolboxes to the search path
 angle_list = [0, pi/6, pi/3, pi/2, pi/2*1.2];
 h2t_list = [2,4,6];
 %1.1
-for idx = 2:length(h2t_list)
-    h2t = h2t_list(idx);
-    %     for i = 3:length(angle_list)
-    for i = 3:3
-        epsilon = angle_list(i);
-        % Initialize the ring
-        c = 0.8;  % b/a
-        a=1; b=a*c;
-        e = sqrt(1-(b/a)^2);
-        L = a*ellipticE(e^2);  % One quarter of the ellipse perimeter
-        runName_r = sprintf('Ellipse_r_P1_h2t%d_c%d_%d',h2t,c,epsilon);
-        t0 = [0; pi/2];
-        x0 = [0,0,0, 1/c^2,0,epsilon/L, 0,1,0, 1,0,0,0, 0, 0;
-            0,0,0, c*cos(epsilon),-c*sin(epsilon),epsilon/L, 0,0,c, 1/sqrt(2)*cos(epsilon/2), 1/sqrt(2)*cos(epsilon/2), ...
-            -1/sqrt(2)*sin(epsilon/2), 1/sqrt(2)*sin(epsilon/2), epsilon,pi/2 ];
-        % F1, F2, F3, k1, k2, k3
-        % r1, r2, r3, q0, q1, q2, q3, theta, t
-        % Set up the continuation problem
-        Y0 = 0; % p(1), angle
-        d = 0;  % p(7), Distance
-        coll_args = {@Ellipse_r_M_P1_ring_c, t0, x0, {'Y','pr','h2t','epsilon','c','L','d'}, [Y0; 0.3;h2t; epsilon; c; L;d]};
-        bvp_args  = [coll_args, {@Ellipse_r_M_P1_ring_bc_c, @Ellipse_r_M_P1_ring_bc_DFDX_c}];
-        prob      = bvp_isol2seg(coco_prob(), '', bvp_args{:});
-        prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',0.2);
-        prob = coco_set(prob, 'corr', 'LogLevel',0);
-        bd1 = coco(prob, runName_r, [], 1, {'d'},[0 a]);
+idx = 2;i = 3;
+c = 0.8;  % b/a
+h2t = h2t_list(idx);
+%     for i = 3:length(angle_list)
+
+epsilon = angle_list(i);
+% Initialize the ring
+
+a=1; b=a*c;
+e = sqrt(1-(b/a)^2);
+L = a*ellipticE(e^2);  % One quarter of the ellipse perimeter
+runName_r = sprintf('Ellipse_r_P1_h2t%d_c%d_%d',h2t,c,epsilon);
+t0 = [0; pi/2];
+x0 = [0,0,0, 1/c^2,0,epsilon/L, 0,1,0, 1,0,0,0, 0, 0;
+    0,0,0, c*cos(epsilon),-c*sin(epsilon),epsilon/L, 0,0,c, 1/sqrt(2)*cos(epsilon/2), 1/sqrt(2)*cos(epsilon/2), ...
+    -1/sqrt(2)*sin(epsilon/2), 1/sqrt(2)*sin(epsilon/2), epsilon,pi/2 ];
+% F1, F2, F3, k1, k2, k3
+% r1, r2, r3, q0, q1, q2, q3, theta, t
+% Set up the continuation problem
+Y0 = 0; % p(1), angle
+d = 0;  % p(7), Distance
+coll_args = {@Ellipse_r_M_P1_ring_c, t0, x0, {'Y','pr','h2t','epsilon','c','L','d'}, [Y0; 0.3;h2t; epsilon; c; L;d]};
+bvp_args  = [coll_args, {@Ellipse_r_M_P1_ring_bc_c, @Ellipse_r_M_P1_ring_bc_DFDX_c}];
+prob      = bvp_isol2seg(coco_prob(), '', bvp_args{:});
+prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',0.2);
+prob = coco_set(prob, 'corr', 'LogLevel',0);
+bd1 = coco(prob, runName_r, [], 1, {'d'},[0 a]);
 
 
-        runName_r_M = sprintf('Ellipse_r_M_P1_h2t%d_c%d_%d',h2t,c,epsilon);
-        labs_r = coco_bd_labs(bd1);
-        sol_r = bvp_read_solution('', runName_r, labs_r(end));
+runName_r_M = sprintf('Ellipse_r_M_P1_h2t%d_c%d_%d',h2t,c,epsilon);
+labs_r = coco_bd_labs(bd1);
+sol_r = bvp_read_solution('', runName_r, labs_r(end));
 
 
-        prob      = bvp_isol2seg(coco_prob(), '', bvp_args{:});
-        %         prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',0.2);
-        %         prob = coco_set(prob, 'corr', 'LogLevel',0);
-        %         prob = coco_set(prob,'cont','h',0.0628,'h_max', 0.0628, 'NAdapt',10);
-        prob = bvp_sol2seg(coco_prob(),'',runName_r,labs_r(end));
-        prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',1);
-        bd2 = coco(prob, runName_r_M, [], 1, {'Y'},[0 2*pi]);
-    end
-end
+prob      = bvp_isol2seg(coco_prob(), '', bvp_args{:});
+%         prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',0.2);
+%         prob = coco_set(prob, 'corr', 'LogLevel',0);
+%         prob = coco_set(prob,'cont','h',0.0628,'h_max', 0.0628, 'NAdapt',10);
+prob = bvp_sol2seg(coco_prob(),'',runName_r,labs_r(end));
+prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',1);
+bd2 = coco(prob, runName_r_M, [], 1, {'Y'},[0 2*pi]);
 
 %% Read results: ring configurations or moment-angle curves
 % close all;clear all;clc;
