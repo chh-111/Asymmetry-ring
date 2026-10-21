@@ -18,7 +18,7 @@ Download or clone the repository. In MATLAB, set the current folder to `Pure-ben
 addpath(genpath(fullfile(pwd, 'coco')));
 ```
 
-**Expected package setup time:** under 10 minutes.
+**Expected package setup time:** under 1 minutes.
 
 ## Demo
 
