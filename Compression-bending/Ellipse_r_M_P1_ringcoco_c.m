@@ -9,11 +9,9 @@ addpath(genpath(fullfile(pwd, 'slanCL')));
 coco_use_recipes_toolbox coll_v1 bvp_v1 % add the coll_v1 and bvp_v1 toolboxes to the search path
 angle_list = [0, pi/6, pi/3, pi/2, pi/2*1.2];
 h2t_list = [2,4,6];
-%1.1
 idx = 2;i = 3;
 c = 0.8;  % b/a
 h2t = h2t_list(idx);
-%     for i = 3:length(angle_list)
 
 epsilon = angle_list(i);
 % Initialize the ring
@@ -38,22 +36,18 @@ prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',0.2);
 prob = coco_set(prob, 'corr', 'LogLevel',0);
 bd1 = coco(prob, runName_r, [], 1, {'d'},[0 a]);
 
-
 runName_r_M = sprintf('Ellipse_r_M_P1_h2t%d_c%d_%d',h2t,c,epsilon);
 labs_r = coco_bd_labs(bd1);
 sol_r = bvp_read_solution('', runName_r, labs_r(end));
 
-
 prob      = bvp_isol2seg(coco_prob(), '', bvp_args{:});
-%         prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',0.2);
-%         prob = coco_set(prob, 'corr', 'LogLevel',0);
-%         prob = coco_set(prob,'cont','h',0.0628,'h_max', 0.0628, 'NAdapt',10);
 prob = bvp_sol2seg(coco_prob(),'',runName_r,labs_r(end));
 prob = coco_set(prob, 'cont', 'NAdapt', 10, 'ItMX', 2000, 'NPR',1);
 bd2 = coco(prob, runName_r_M, [], 1, {'Y'},[0 2*pi]);
 
+
+
 %% Read results: ring configurations or moment-angle curves
-% close all;clear all;clc;
 coco_use_recipes_toolbox coll_v1 bvp_v1 % add the coll_v1 and bvp_v1 toolboxes to the search path
 Color_arry = tab20c(20);
 line_type = {'-','--',':'};
@@ -96,8 +90,6 @@ if plotflag == 1
         xlim([-1.5,1.5]);
         ylim([-1.5,1.5]);
         zlim([-1,1]);
-        %                 grid off;
-        %                 set(gcf, 'Color', 'none');   % Transparent figure background
     end
 else
     figure
@@ -112,23 +104,15 @@ else
     end
     M2bar = 2*K2bar;
     plot(Yer/pi*180,-M2bar,'Color',Color_arry(4*(i-1)+1,:),'LineStyle',line_type{1},'Linewidth',2,'DisplayName', sprintf('Ellip-h/t%d-c%d-ε-= %.2f',h2t,c,angle_list(i))); hold on;
-    %             xlabel('Angle(rad)'); ylabel('M2bar');
     save([runName_r_M '_response.mat'],'Yer','M2bar');
     xlabel('Loading angle (deg)');
     ylabel('-M2bar');
 end
 
 hold on;
-% ylim([-8,8]);
-% xlim([0,360]);
-% legend('show','Location','best','FontSize',20,'Box','off');
 
-% xticks([0,100,200,300,360]);
-% grid on;
 grid off;
 set(gca,'GridAlpha',1,'FontName','Times New Roman','FontSize',20,'LineWidth',2,'FontWeight','bold');
-
-
 
 %% Extract y1 versus loading angle
 % Use the same run and parameter case as in the response extraction above.
@@ -154,9 +138,7 @@ legend('show','Location','best','FontSize',20,'Box','off');
 set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',2,'FontWeight','bold');
 save([runName_r_M '_y1_angle.mat'],'Yer','y1');
 
-
-
-%%  Figure: plot ribbon
+%% Figure: plot ribbon
 coco_use_recipes_toolbox coll_v1 bvp_v1 % add the coll_v1 and bvp_v1 toolboxes to the search path
 Color_arry = tab20c(20);
 angle_list = [0, pi/6, pi/3, pi/2, pi/2*1.2];
@@ -172,15 +154,8 @@ runName_r_M = sprintf('Ellipse_r_M_P1_h2t%d_c%d_%d',h2t,c,epsilon);
 bd1 = coco_bd_read(runName_r_M); % Extract bifurcation data
 bd = coco_bd_read(runName_r_M);
 
-
-
-%%  Select configurations for forward loading
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Select configurations for forward loading
 % turning-back segment for h/t = 4, epsilon = 60 degrees, c = 0.8: labels 121 (96.3 deg) to 371 (96.1 deg)
-
-
-% Palette dependencies: slanCL (and slanCM if optional gradients are enabled).
-% savepath
 
 figure
 
@@ -189,41 +164,32 @@ colors = slanCL(25);
 
 Yq_for = [0:pi/6:pi];
 
-% ===== Set label intervals to exclude during angle-based sampling =====
+% Set label intervals to exclude during angle-based sampling
 lab_exclude = [
     121, 371
 ]; %%% Interval identified from the computed response curve
 
-% ===== Select labels closest to the target loading angles outside the excluded intervals =====
+% Select labels closest to the target loading angles outside the excluded intervals
 plot_lab_for = coco_get_labs_at_Y_exclude(bd, Yq_for, lab_exclude);
 
 % Include any additional manually selected labels if required
 plot_lab_for = unique([plot_lab_for, lab_exclude(:).'], 'stable');
 
-
 plot_lab_0 = plot_lab_for;
 
-
-
-%%  Render configurations for forward loading
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Render configurations for forward loading
 figure
 
 idp = 3;colors = slanCL(25);
 
-
-plot_lab_0 = plot_lab_for;  
+plot_lab_0 = plot_lab_for;
 
 angle_0 = [];
 for lab = plot_lab_for
-    %         figure;
     labs_length = length(plot_lab_for);
-    % idp=5;
     sol = bvp_read_solution('', runName_r_M, lab); % Extract solution
     sol.x(:,8) = sol.x(:,8)+2;
-    % sol.x(:,)
-    % colors = slanCL(25);
-    % ===== Select the ribbon opacity =====
+    % Select the ribbon opacity
     if ismember(lab, plot_lab_0)
         alpha_use = 1;    % Fully opaque selected configuration
         angle_0 = [angle_0,sol.p(1)/pi*180];
@@ -235,24 +201,20 @@ for lab = plot_lab_for
     grid off;
     axis off;
     fprintf('Loading angle: %.2f deg\n', sol.p(1)/pi*180);
-    %         xlabel('x');ylabel('y');zlabel('z');
 end
 
-%%   Tip trajectories and markers: forward loading
-% ===== Collect the gripper-tip trajectory =====
+%% Tip trajectories and markers: forward loading
+% Collect the gripper-tip trajectory
 labs = coco_bd_labs(bd);
-
 
 % Trajectory segments for h/t = 4, epsilon = 60 degrees, c = 0.8
 plot_lab_for_l1 = [1:4:121];
 plot_lab_for_l2 = [371:2:478];
 plot_lab_for_l3 = [121:2:371];
 
-
-
 traj = []; % Each row stores [x y z] in the solution coordinate system
 Yer = [];
-%%%%%%%%%%%%%%%%%%%% Collect the pre-snap trajectory segment
+% Collect the pre-snap trajectory segment
 for lab = plot_lab_for_l1
     sol = bvp_read_solution('', runName_r_M, lab); % Extract solution
     xt = sol.x(end,7);
@@ -261,14 +223,14 @@ for lab = plot_lab_for_l1
     Yer = [Yer;sol.p(1)];
     traj = [traj; xt yt zt];
 end
-% ===== Plot the gripper-tip trajectory =====
+% Plot the gripper-tip trajectory
 if size(traj,1) > 1
     plot3( ...
         traj(:,2)-3.5, traj(:,3), traj(:,1), ... % Display coordinate order: (y,z,x)
         'Color',[0,0,0], ...
         'LineWidth', 2 ); hold on;
 end
-%%%%%%%%%%%%%%%%%%%% Collect the post-snap trajectory segment
+% Collect the post-snap trajectory segment
 traj = []; % Each row stores [x y z] in the solution coordinate system
 Yer = [];
 for lab = plot_lab_for_l2
@@ -279,7 +241,7 @@ for lab = plot_lab_for_l2
     Yer = [Yer;sol.p(1)];
     traj = [traj; xt yt zt];
 end
-% ===== Plot the gripper-tip trajectory =====
+% Plot the gripper-tip trajectory
 if size(traj,1) > 1
     plot3( ...
         traj(:,2)-3.5, traj(:,3), traj(:,1), ... % Display coordinate order: (y,z,x)
@@ -287,7 +249,7 @@ if size(traj,1) > 1
         'LineWidth', 2 ); hold on;
 end
 
-%%%%%%%%%%%%%%%%%%%% Collect the intervening snap-through branch
+% Collect the intervening snap-through branch
 traj = []; % Each row stores [x y z] in the solution coordinate system
 Yer = [];
 for lab = plot_lab_for_l3
@@ -298,7 +260,7 @@ for lab = plot_lab_for_l3
     Yer = [Yer;sol.p(1)];
     traj = [traj; xt yt zt];
 end
-% ===== Plot the gripper-tip trajectory =====
+% Plot the gripper-tip trajectory
 if size(traj,1) > 1
     plot3( ...
         traj(:,2)-3.5, traj(:,3), traj(:,1), ... % Display coordinate order: (y,z,x)
@@ -307,9 +269,6 @@ if size(traj,1) > 1
         'LineStyle','--'); hold on;
 end
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 colors1 = slanCL(1661);
 colors2 = slanCL(1664);
 colors_for = colors1(1:5,:);
@@ -318,33 +277,22 @@ colors_back = colors2(7:11,:);
 colors1 = slanCL(527);
 colors2 = slanCL(530);
 colors_for = colors1(2:8,:);
-% colors_for = flipud(colors_for);
 n_for = length(plot_lab_for);
 colors_for = interpomap(n_for,colors_for);
 
 colors_back = colors2(2:8,:);
 colors_back = flipud(colors_back);
-% colors_back = flipud(colors_back);
-% n_back = length(plot_lab_back);
-% colors_back = interpomap(n_back,colors_back);
-
 
 colors_p = [colors_for];
 
-% N = length(Yq_p);
-% colors_p = interpomap(N,colors_p);
-
 plot_lab_p = [plot_lab_for];
 
-% =========Plot colored tip markers=========
+% Plot colored tip markers
 for idp = 1:length(plot_lab_p)
     lab = plot_lab_p(idp);
     labs_length = length(plot_lab_p);
-    %         idp = idp+1;
-    % idp=5;
     sol = bvp_read_solution('', runName_r_M, lab); % Extract solution
 
-    % colors = slanCL(97);
     last_p = round(size(sol.x,1));   % Final node of the quarter-ring solution (gripper tip)
     xt = sol.x(last_p,7);
     yt = sol.x(last_p,8);
@@ -359,26 +307,15 @@ for idp = 1:length(plot_lab_p)
         'LineWidth',1.5);
     scatter3(0,0,0,40,'filled','k');
 
-
-    % text( yt, zt, xt, ...             % Use the same (y,z,x) coordinate order as the ribbon surfaces
-    %     sprintf('Y = %.2f°,%d', sol.p(1)/pi*180,lab), ...
-    %     'FontSize',14, ...
-    %     'FontName','Times New Roman', ...
-    %     'FontWeight','bold', ...
-    %     'Color',[1 0 0]);
-
 end
 
 angle_0_rad = angle_0/180*pi;
-% set(gca, 'SortMethod', 'childorder');
 drawnow;
 axis on;
 xlabel({'x'});ylabel({'y'});zlabel({'z'});
 
-
 angle_0_rad = angle_0/180*pi;
 step = angle_0_rad / 6.28;
-% set(gca, 'SortMethod', 'childorder');
 drawnow;
 box on;
 ylim([-2,2]);
@@ -388,22 +325,10 @@ set(gca,'GridAlpha',1,'FontName','Arial','FontSize',18,'LineWidth',1.5);
 material([0.3 0.6 0.3 5 0]);
 light('Position',[-4 0 0],'Style','infinite');     % Rim light
 view(-90,0);
-% view(-90,0);
 
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'c10-0du-1.png', '-dpng', '-r1200');
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'c07-60du-5.png', '-dpng', '-r1200');
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'SI-H2T6-c08-60du-1-Forward.png', '-dpng', '-r1200');
-
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'c10-0du-3.png', '-dpng', '-r1200');
 axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'h2t4-c08-60du-1.png', '-dpng', '-r1200');
-% 
-% axis off;print(gcf, 'c10-0du-2.eps', '-depsc2', '-r600');
-% axis off;print(gcf, 'c10-0du-1.png', '-dpng', '-r1200');
-% axis off;print(gcf, 'c10-0du-3.png', '-dpng', '-r1200');
 
-
-
-% ========= colormap strip for points =========
+% colormap strip for points
 N = size(colors_p,1);   % Number of colors, matching the tip markers
 
 figure('Color','w','Position',[200 200 600 120]);
@@ -427,32 +352,20 @@ ylim([-0.6, 0.6]);
 
 set(gca,'FontName','Arial','FontSize',14,'LineWidth',1);
 
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'colormap_0duc10_2.png', '-dpng', '-r1200');
-% axis off;print(gcf, 'colormap_0duc10_2.eps', '-depsc2', '-r600');
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'colormap_60duc07.png', '-dpng', '-r1200');
-% axis off;print(gcf, 'colormap_60duc07.eps', '-depsc2', '-r600');
-
-
-
-
-
-
-%%  Select configurations for reverse loading
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Select configurations for reverse loading
 
 figure
 
 idp = 5;colors = slanCL(97);
 
-
 Yq_back = [pi:pi/6:2*pi];
 
-% ===== Set label intervals to exclude during angle-based sampling =====
+% Set label intervals to exclude during angle-based sampling
 lab_exclude = [
     2, 3
 ];  % Retain the original placeholder exclusion [2,3] for reverse loading; no reverse turning-back segment is specified
 
-% ===== Select labels closest to the target loading angles outside the excluded intervals =====
+% Select labels closest to the target loading angles outside the excluded intervals
 plot_lab_back = coco_get_labs_at_Y_exclude(bd, Yq_back, lab_exclude);
 
 % Include any additional manually selected labels if required
@@ -460,20 +373,16 @@ plot_lab_back = unique([plot_lab_back], 'stable');
 
 plot_lab_0 = plot_lab_back;
 
-
-
 %% Render configurations for reverse loading
 figure
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 idp = 5;colors = slanCL(97);
     labs = coco_bd_labs(bd);
 
 angle_0 = [];
 for lab = plot_lab_back
-    %         figure;
     labs_length = length(plot_lab_back);
     sol = bvp_read_solution('', runName_r_M, lab); % Extract solution
-    % ===== Select the ribbon opacity =====
+    % Select the ribbon opacity
     if ismember(lab, plot_lab_0)
         alpha_use = 1;    % Fully opaque selected configuration
         angle_0 = [angle_0,sol.p(1)/pi*180];
@@ -483,25 +392,20 @@ for lab = plot_lab_back
     plotRibbon(sol, idp, colors, alpha_use);
 
     legend(sprintf('Y=%.1f,h/t%d-ε=%.2f-lab=%d',sol.p(1)/pi*180,h2t, angle_list(i),lab),'Location','best','FontSize',20)
-    % grid off;
-    % axis off;
     fprintf('Loading angle: %.2f deg\n', sol.p(1)/pi*180);
-    %         xlabel('x');ylabel('y');zlabel('z');
 end
 
-%%   Tip trajectories and markers: reverse loading
-% ===== Collect the gripper-tip trajectory =====
+%% Tip trajectories and markers: reverse loading
+% Collect the gripper-tip trajectory
 labs = coco_bd_labs(bd);
 
-%  Trajectory segments for h/t = 4, epsilon = 60 degrees, c = 0.8
+% Trajectory segments for h/t = 4, epsilon = 60 degrees, c = 0.8
 plot_lab_back_l1 = [478:1:721];
 plot_lab_back_l2 = [];
 
-
-
 traj = []; % Each row stores [x y z] in the solution coordinate system
 Yer = [];
-%%%%%%%%%%%%%%%%%%%% Collect the pre-snap trajectory segment
+% Collect the pre-snap trajectory segment
 for lab = plot_lab_back_l1
     sol = bvp_read_solution('', runName_r_M, lab); % Extract solution
     xt = sol.x(end,7);
@@ -510,14 +414,14 @@ for lab = plot_lab_back_l1
     Yer = [Yer;sol.p(1)];
     traj = [traj; xt yt zt];
 end
-% ===== Plot the gripper-tip trajectory =====
+% Plot the gripper-tip trajectory
 if size(traj,1) > 1
     plot3( ...
         traj(:,2)-3.5, traj(:,3), traj(:,1), ... % Display coordinate order: (y,z,x)
         'Color',[0,0,0], ...
         'LineWidth', 2 ); hold on;
 end
-%%%%%%%%%%%%%%%%%%%% Collect the post-snap trajectory segment
+% Collect the post-snap trajectory segment
 traj = []; % Each row stores [x y z] in the solution coordinate system
 Yer = [];
 for lab = plot_lab_back_l2
@@ -528,7 +432,7 @@ for lab = plot_lab_back_l2
     Yer = [Yer;sol.p(1)];
     traj = [traj; xt yt zt];
 end
-% ===== Plot the gripper-tip trajectory =====
+% Plot the gripper-tip trajectory
 if size(traj,1) > 1
     plot3( ...
         traj(:,2)-3.5, traj(:,3), traj(:,1), ... % Display coordinate order: (y,z,x)
@@ -536,7 +440,6 @@ if size(traj,1) > 1
         'LineWidth', 2 ); hold on;
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 colors1 = slanCL(1661);
 colors2 = slanCL(1664);
 colors_for = colors1(1:5,:);
@@ -545,32 +448,22 @@ colors_back = colors2(7:11,:);
 colors1 = slanCL(527);
 colors2 = slanCL(530);
 colors_for = colors1(2:8,:);
-% colors_for = flipud(colors_for);
-% n_for = length(plot_lab_for);
-% colors_for = interpomap(n_for,colors_for);
 
 colors_back = colors2(2:8,:);
 colors_back = flipud(colors_back);
-% colors_back = flipud(colors_back);
 n_back = length(plot_lab_back);
 colors_back = interpomap(n_back,colors_back);
 
 colors_p = [colors_back];
 
-% N = length(Yq_p);
-% colors_p = interpomap(N,colors_p);
-
 plot_lab_p = [plot_lab_back];
 
-% =========Plot colored tip markers=========
+% Plot colored tip markers
 for idp = 1:length(plot_lab_p)
     lab = plot_lab_p(idp);
     labs_length = length(plot_lab_p);
-    %         idp = idp+1;
-    % idp=5;
     sol = bvp_read_solution('', runName_r_M, lab); % Extract solution
 
-    % colors = slanCL(97);
     last_p = round(size(sol.x,1));   % Final node of the quarter-ring solution (gripper tip)
     xt = sol.x(last_p,7);
     yt = sol.x(last_p,8);
@@ -585,25 +478,15 @@ for idp = 1:length(plot_lab_p)
         'LineWidth',1.5);
     scatter3(0,0,0,40,'filled','k');
 
-
-%     text( yt, zt, xt, ...             % Use the same (y,z,x) coordinate order as the ribbon surfaces
-%         sprintf('Y = %.2f°,%d', sol.p(1)/pi*180,lab), ...
-%         'FontSize',14, ...
-%         'FontName','Times New Roman', ...
-%         'FontWeight','bold', ...
-%         'Color',[1 0 0]); 3b
-
 end
 
 angle_0_rad = angle_0/180*pi;
-% set(gca, 'SortMethod', 'childorder');
 drawnow;
 axis on;
 xlabel({'x'});ylabel({'y'});zlabel({'z'});
 
 angle_0_rad = angle_0/180*pi;
 step = angle_0_rad / 6.28;
-% set(gca, 'SortMethod', 'childorder');
 drawnow;
 box on;
 ylim([-3,3]);
@@ -614,10 +497,7 @@ material([0.3 0.6 0.3 5 0]);
 light('Position',[-4 0 0],'Style','infinite');     % Rim light
 view(-90,0);
 
-
-
-
-% ========= colormap strip for points =========
+% colormap strip for points
 N = size(colors_p,1);   % Number of colors, matching the tip markers
 
 figure('Color','w','Position',[200 200 600 120]);
@@ -641,13 +521,7 @@ ylim([-0.6, 0.6]);
 
 set(gca,'FontName','Arial','FontSize',14,'LineWidth',1);
 
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'colormap_0duc10.png', '-dpng', '-r1200');
-% axis off;print(gcf, 'colormap_0duc10.eps', '-depsc2', '-r600');
-% axis off;set(gcf,'Color','w');set(gcf,'InvertHardcopy','off');print(gcf, 'colormap_60duc07_reverse.png', '-dpng', '-r1200');
-% axis off;print(gcf, 'colormap_60duc07_reverse.eps', '-depsc2', '-r600');
-
-
-%% ====== Plot the colors_p color strip and marker outlines ======
+%% Plot the colors_p color strip and marker outlines
 figure('Color','w','Units','pixels','Position',[100 100 1400 120]); % Wide figure for the color strip
 y0 = 0.5 * ones(size(x));
 
@@ -659,7 +533,6 @@ ylim([0 1])
 
 print(gcf, 'color_p_6.png', '-dpng', '-r1200');
 print(gcf, 'color_p_6.eps', '-depsc', '-r600');
-
 
 N = length(x);          % Number of outline markers, matching the color-strip points
 
@@ -680,6 +553,3 @@ end
 set(gcf,'Color','w');
 set(gca,'FontName','Arial','FontSize',16,'LineWidth',1);
 box on;
-
-
-

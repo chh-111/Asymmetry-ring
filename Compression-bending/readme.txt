@@ -3,8 +3,6 @@ COMPRESSION-BENDING
 
 Main script: Ellipse_r_M_P1_ringcoco_c.m
 
-Files with DYN in their names are Abaqus simulation input files using implicit dynamic analysis steps.
-
 Usage
 -----
 Set this folder as the MATLAB current folder. Change c = b/a, epsilon
@@ -26,8 +24,6 @@ Ribbon rendering
 The supplied rendering code shows only the intrinsically twisted elliptical
 ring with h2t = 4, epsilon = pi/3 (60 degrees), and c = 0.8:
     idx = 2; i = 3; c = 0.8;
-
-
 
 Compute or load the matching COCO branch before plotting; label values
 are specific to each continuation run.

@@ -21,8 +21,8 @@ Outputs
 
 Ribbon rendering
 ----------------
-Edit idx, i, and c in the ribbon section, then activate the corresponding
-plot_lab_0 assignment. The four Fig. 1 cases use h2t = 6:
+Edit idx, i, c, and plot_lab_0 in the ribbon section using the values
+listed below. The four Fig. 1 cases use h2t = 6:
 
 Ring                              idx   i    c     plot_lab_0
 Untwisted circular                 3    1   1.0    [373,549]
@@ -31,8 +31,8 @@ Untwisted elliptical               3    1   0.8    [428,595]
 60-degree twisted elliptical       3    3   0.8    [627,840,925]
 
 For example: idx = 3; i = 1; c = 1; plot_lab_0 = [373,549];
-Keep only one plot_lab_0 assignment active. These selected configurations
-are fully opaque; background configurations remain transparent.
+Use one set of case values at a time. The selected configurations are
+fully opaque; background configurations remain transparent.
 
 Compute or load the matching COCO branch before plotting. The listed
 labels belong to the corresponding saved runs; check them again after

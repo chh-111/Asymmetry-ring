@@ -2,16 +2,14 @@
 clear all;
 clc;
 
-
 addpath(genpath(fullfile(pwd, 'coco')));
 addpath(genpath(fullfile(pwd, 'slanCL')));
 coco_use_recipes_toolbox coll_v1 bvp_v1 % Add the coll_v1 and bvp_v1 toolboxes to the search path
 angle_list = [0, pi/6, pi/3, pi/2, pi/2*1.2];
 h2t_list = [2,4,6,1];
 
-idx = 3;i = 3; 
+idx = 3;i = 3;
 h2t = h2t_list(idx);
-%     for i = 3:length(angle_list)
 
 epsilon = angle_list(i);
 a=1; b=0.8;  % b=1 or b=0.8
@@ -25,7 +23,6 @@ x0 = [0,0,0, 1/c^2,0,epsilon/L, 0,1,0, 1,0,0,0, 0, 0;
     -1/sqrt(2)*sin(epsilon/2), 1/sqrt(2)*sin(epsilon/2), epsilon,pi/2 ];
 % F1, F2, F3, k1, k2, k3
 % r1, r2, r3, q0, q1, q2, q3, theta, t
-%
 Y0 = 0; % p(1), angle
 coll_args = {@Ellipse_M_P1_ring_c, t0, x0, {'Y','pr','h2t','epsilon','c','L'}, [Y0; 0.3;h2t; epsilon; c; L]};
 bvp_args  = [coll_args, {@Ellipse_M_P1_ring_bc_c, @Ellipse_M_P1_ring_bc_DFDX_c}];
@@ -38,7 +35,6 @@ prob = coco_set(prob,'cont','h',0.0628,'h_max', 0.0628, 'h_min', 0.0628, 'NAdapt
 bd1 = coco(prob, runName, [], 1, {'Y'},[0 2*pi]);
 
 %% Read results: ring configurations or moment-angle curves
-%% Direction1 Forward loading
 clear all;
 clc;
 
@@ -49,13 +45,10 @@ coco_use_recipes_toolbox coll_v1 bvp_v1 % Add the coll_v1 and bvp_v1 toolboxes t
 angle_list = [0, pi/6, pi/3, pi/2, pi/2*1.2];
 h2t_list = [2,4,6,1];
 
-
 Color_arry = tab20c(20);
 line_type = {'-','--',':'};
 angle_name=[0,30,60,90];
 
-
-% for idx = 1:length(epsilon)
 idx = 3;i=3;c=0.8;
 h2t = h2t_list(idx);
 
@@ -94,10 +87,7 @@ if plotflag == 1
         zlim([-1,1]);
         axis off;
         grid off;
-        %                 view(0,90);
     end
-    %         legend(sprintf('Ellip-h/t%d-ε = %.2f',h2t, angle_list(i)),'Location','best','FontSize',20)
-    %         set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',2,'FontWeight','bold');
 else
     figure;
     Yer = zeros(numel(labs),1);
@@ -110,7 +100,6 @@ else
     end
     M2bar = 2*K2bar;
     plot(Yer/pi*180,-M2bar,'Color',Color_arry(4*(i-1)+1,:),'LineStyle',line_type{1},'Linewidth',2,'DisplayName', sprintf('Ellip-h/t%d-ε = %.2f',h2t, angle_list(i))); hold on;
-    %             xlabel('Angle(rad)'); ylabel('M2bar');
 
     save([runName '_response.mat'],'Yer','M2bar');
 end
@@ -125,7 +114,6 @@ if plotflag ~= 1
     legend('show','Location','best','FontSize',20,'Box','off');
     set(gca,'GridAlpha',1,'FontName','Times New Roman','FontSize',20,'LineWidth',2,'FontWeight','bold');
 end
-% print(gcf, 'myfigure.png', '-dpng', '-r1200');
 
 %% Extract y1 versus loading angle
 % y1 is the gripper-tip out-of-plane displacement: sol.x(end,7).
@@ -155,9 +143,7 @@ ylabel('y_1/a');
 legend('show','Location','best','FontSize',20,'Box','off');
 set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',2,'FontWeight','bold');
 
-
-
-%%  Figure: plot ribbon
+%% Figure: plot ribbon
 coco_use_recipes_toolbox coll_v1 bvp_v1 % add the coll_v1 and bvp_v1 toolboxes to the search path
 Color_arry = tab20c(20);
 angle_list = [0, pi/6, pi/3, pi/2, pi/2*1.2];
@@ -177,14 +163,11 @@ figure
 idp = 0;
 Yq = [0:0.0628*3:2*pi,2*pi];          % Uniform spacing in loading angle (rad)
 plot_lab = coco_get_labs_at_Y(bd, Yq);
-% plot_lab_0 = [373,549];   % Selected fully opaque states for the 0-degree circular ring (Fig. 1)
-% plot_lab_0 = [528,856,763];   % Selected fully opaque states for the 60-degree twisted circular ring (Fig. 1)
-% plot_lab_0 = [428,595];   % Selected fully opaque states for the untwisted c = 0.8 ring (Fig. 1)
 plot_lab_0 = [627,840,925];   % Selected fully opaque states for the 60-degree twisted c = 0.8 ring (Fig. 1)
 plot_lab = [plot_lab, plot_lab_0, plot_lab(end)]; % Append selected states and redraw the final state
 idc = 0;
 
-% ===== Pre-scan the selected states for the moment-based color range =====
+% Pre-scan the selected states for the moment-based color range
 a=1;b=a*c;
 e = sqrt(1-(b/a)^2);
 L = a*ellipticE(e^2);  % One quarter of the ellipse perimeter
@@ -198,18 +181,14 @@ end
 M2bar_min = min(M2bar_all);
 M2bar_max = max(M2bar_all);
 
-
-
 for lab = plot_lab
-    %         figure;
     labs_length = length(plot_lab);
-    %         idp = idp+1;
     idc = idc+1;
     sol = bvp_read_solution('', runName, lab); % Extract solution
 
     colors = slanCL(84);  idp = 1;
 
-    % ===== Select the ribbon opacity =====
+    % Select the ribbon opacity
     if ismember(lab, plot_lab_0)
         alpha_use = 1;    % Fully opaque selected configuration
         idp = 1;
@@ -217,20 +196,11 @@ for lab = plot_lab
         alpha_use = 0.1;    % Faint initial configuration
         idp = 1;
     else
-        %%%%%%%%%%%%%%%%Uniform ribbon color
+        % Uniform ribbon color
         alpha_use = 0.05;    % Faint background configuration
         idp = 1;
-        %%%%%%%%%%%%%%%%Optional moment-based color gradient
-        % colors = slanCM('heat',256);
-        % colors = colors([50:175],:);
-        % M2bar = -(sol.x(1,6)-k3u);
-        % s = (M2bar - M2bar_min) / (M2bar_max - M2bar_min + eps);   % Normalize to [0,1]
-        % idp = 1 + round( (1 - s) * (size(colors,1) - 1) );  % Reverse the color mapping: s=1 -> first color, s=0 -> last color
-        % idp = max(1, min(size(colors,1), idp));       % Keep the color index within bounds
-        % alpha_use = 0.05;
     end
     plotRibbon(sol, idp, colors, alpha_use);
-
 
     last_p = round(size(sol.x,1));   % Final node of the quarter-ring solution (gripper tip)
     xt = sol.x(last_p,7);
@@ -241,7 +211,6 @@ for lab = plot_lab
     grid off;
     axis off;
     fprintf('Loading angle: %.2f deg\n', sol.p(1)/pi*180);
-    %         xlabel('x');ylabel('y');zlabel('z');
     view(-90,0);
 end
 axis on;
@@ -251,15 +220,6 @@ XL = xlim(ax);
 YL = ylim(ax);
 ZL = zlim(ax);
 
-% delete(findall(gca,'Type','light'))
-% material([0.3 0.6 1.0 20 0.5]);
-% material([0.3 0.6 0.3 5 0]);
-% camlight('headlight');
-% light('Style','ambient','Color',[0.3,1,1]);
-% light('Position',[-4 0 0],'Style','infinite');     % Rim light
-% axis off;print(gcf, '0121_A_60°c08_test2.png', '-dpng', '-r1200');
-
-% %
 material([0.3 0.6 0.3 5 0]);
 light('Position',[-4 0 0],'Style','infinite');     % Rim light
 light('Style','local','Position',[-6 0 4]*3);
