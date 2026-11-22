@@ -36,3 +36,7 @@ The supplied `data/` folders contain saved COCO branches and solutions. To reuse
 ## Instructions for use
 
 See `readme.txt` in the `Pure-bending` and `Compression-bending` folders for detailed instructions.
+
+## License
+
+The original MATLAB code for this study is released under the [MIT License](LICENSE). COCO and the plotting utilities have their own open-source licenses, listed on their [project pages](#system-requirements).
